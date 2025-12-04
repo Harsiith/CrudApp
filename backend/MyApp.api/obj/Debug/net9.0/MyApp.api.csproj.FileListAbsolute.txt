@@ -1,0 +1,7 @@
+D:\CrudApp\backend\MyApp.api\obj\Debug\net9.0\MyApp.api.csproj.AssemblyReference.cache
+D:\CrudApp\backend\MyApp.api\obj\Debug\net9.0\MyApp.api.GeneratedMSBuildEditorConfig.editorconfig
+D:\CrudApp\backend\MyApp.api\obj\Debug\net9.0\MyApp.api.AssemblyInfoInputs.cache
+D:\CrudApp\backend\MyApp.api\obj\Debug\net9.0\MyApp.api.AssemblyInfo.cs
+D:\CrudApp\backend\MyApp.api\obj\Debug\net9.0\MyApp.api.csproj.CoreCompileInputs.cache
+D:\CrudApp\backend\MyApp.api\obj\Debug\net9.0\MyApp.api.MvcApplicationPartsAssemblyInfo.cs
+D:\CrudApp\backend\MyApp.api\obj\Debug\net9.0\MyApp.api.MvcApplicationPartsAssemblyInfo.cache
