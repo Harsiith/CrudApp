@@ -2,8 +2,8 @@ using CrudApi.Data;
 using CrudApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using OfficeOpenXml;
 using QuestPDF.Fluent;
+using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 
 namespace CrudApi.Controllers
@@ -19,95 +19,79 @@ namespace CrudApi.Controllers
             _context = context;
         }
 
-        // GET: api/employee
+        // ----------------------- GET ALL -----------------------
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Employee>>> GetEmployees()
+        public async Task<IActionResult> GetAll()
         {
-            return await _context.Employees.ToListAsync();
+    
+            var employees = await _context.Employees.ToListAsync();
+            return Ok(employees);
         }
 
-        // GET: api/employee/5
+        // ----------------------- GET BY ID -----------------------
         [HttpGet("{id}")]
-        public async Task<ActionResult<Employee>> GetEmployee(int id)
+        public async Task<IActionResult> GetById(int id)
         {
-            var employee = await _context.Employees.FindAsync(id);
-            if (employee == null)
+            var emp = await _context.Employees.FindAsync(id);
+            if (emp == null)
                 return NotFound();
 
-            return employee;
+            return Ok(emp);
         }
 
-        // POST: api/employee
+        // ----------------------- CREATE -----------------------
         [HttpPost]
-        public async Task<ActionResult<Employee>> AddEmployee(Employee emp)
+        public async Task<IActionResult> Create(Employee emp)
         {
             _context.Employees.Add(emp);
             await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetEmployee), new { id = emp.Id }, emp);
+            return Ok(emp);
         }
 
-        // PUT: api/employee/id
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateEmployee(int id, Employee emp)
+        [HttpPost]
+        public async Task<IActionResult> Create(Employee emp)
         {
-            if (id != emp.Id)
-                return BadRequest();
-
-            _context.Entry(emp).State = EntityState.Modified;
+            _context.Employees.Add(emp);
             await _context.SaveChangesAsync();
-
-            return NoContent();
+            return Ok(emp);
         }
 
-        // DELETE: api/employee/id
+
+        // ----------------------- UPDATE -----------------------
+        [HttpPut("{id}")]
+public async Task<IActionResult> Update(int id, Employee emp)
+{
+    var existing = await _context.Employees.FindAsync(id);
+    if (existing == null)
+        return NotFound();
+
+    existing.Name = emp.Name;
+    existing.Department = emp.Department;
+    existing.Age = emp.Age;
+
+    await _context.SaveChangesAsync();
+    return Ok(existing);
+}
+
+
+        
+
+        // ----------------------- DELETE -----------------------
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteEmployee(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var employee = await _context.Employees.FindAsync(id);
-            if (employee == null)
+            var emp = await _context.Employees.FindAsync(id);
+            if (emp == null)
                 return NotFound();
 
-            _context.Employees.Remove(employee);
+            _context.Employees.Remove(emp);
             await _context.SaveChangesAsync();
-
-            return NoContent();
+            return Ok();
         }
 
-        // =================== EXCEL DOWNLOAD ===================
-        [HttpGet("download-excel")]
-        public async Task<IActionResult> DownloadExcel()
-        {
-            var employees = await _context.Employees.ToListAsync();
-            using var package = new ExcelPackage();
-            var sheet = package.Workbook.Worksheets.Add("Employees");
-
-            // Header
-            sheet.Cells[1, 1].Value = "ID";
-            sheet.Cells[1, 2].Value = "Name";
-            sheet.Cells[1, 3].Value = "Department";
-            sheet.Cells[1, 4].Value = "Salary";
-
-            int row = 2;
-            foreach (var emp in employees)
-            {
-                sheet.Cells[row, 1].Value = emp.Id;
-                sheet.Cells[row, 2].Value = emp.Name;
-                sheet.Cells[row, 3].Value = emp.Department;
-                sheet.Cells[row, 4].Value = emp.Salary;
-                row++;
-            }
-
-            return File(
-                package.GetAsByteArray(),
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                "Employees.xlsx"
-            );
-        }
-
-        // =================== PDF DOWNLOAD ===================
-        [HttpGet("download-pdf")]
-        public async Task<IActionResult> DownloadPdf()
+        // ----------------------- EXPORT PDF -----------------------
+        [HttpGet("export/pdf")]
+        public async Task<IActionResult> ExportPdf()
         {
             var employees = await _context.Employees.ToListAsync();
 
@@ -116,42 +100,36 @@ namespace CrudApi.Controllers
                 container.Page(page =>
                 {
                     page.Margin(20);
-
-                    page.Header()
-                        .Text("Employee List")
-                        .FontSize(20)
-                        .Bold()
-                        .AlignCenter();
+                    page.Header().Text("Employee Report").FontSize(22).SemiBold();
 
                     page.Content().Table(table =>
                     {
-                        table.ColumnsDefinition(columns =>
+                        table.ColumnsDefinition(cols =>
                         {
-                            columns.ConstantColumn(40);
-                            columns.RelativeColumn();
-                            columns.RelativeColumn();
-                            columns.RelativeColumn();
+                            cols.RelativeColumn();
+                            cols.RelativeColumn();
                         });
 
-                        table.Cell().Text("ID").Bold();
-                        table.Cell().Text("Name").Bold();
-                        table.Cell().Text("Department").Bold();
-                        table.Cell().Text("Salary").Bold();
-
-                        foreach (var emp in employees)
+                        table.Header(header =>
                         {
-                            table.Cell().Text(emp.Id.ToString());
-                            table.Cell().Text(emp.Name);
-                            table.Cell().Text(emp.Department);
-                            table.Cell().Text(emp.Salary.ToString());
+                            header.Cell().Text("Name").Bold();
+                            header.Cell().Text("Department").Bold();
+                        });
+
+                        foreach (var e in employees)
+                        {
+                            table.Cell().Text(e.Name);
+                            table.Cell().Text(e.Department);
                         }
                     });
+
+                    page.Footer().AlignCenter().Text($"Generated: {DateTime.Now}");
                 });
             });
 
-            var pdf = document.GeneratePdf();
+            byte[] pdf = document.GeneratePdf();
 
-            return File(pdf, "application/pdf", "Employees.pdf");
+            return File(pdf, "application/pdf", "employees.pdf");
         }
     }
 }

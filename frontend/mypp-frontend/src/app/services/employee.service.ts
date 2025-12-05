@@ -42,7 +42,9 @@ export class EmployeeService {
 }
 
 downloadPdf() {
-  return this.http.get('http://localhost:5280/api/export/pdf', { responseType: 'blob' });
+  return this.http.get('https://localhost:7118/api/Employee/pdf', {
+    responseType: 'blob'
+  });
 }
 
 }

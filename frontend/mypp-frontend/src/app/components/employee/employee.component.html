@@ -1,29 +1,67 @@
 <h2>Employee Management</h2>
 
 <!-- Employee Form -->
-<form (ngSubmit)="isEditMode ? updateEmployee() : addEmployee()">
+<form #empForm="ngForm" (ngSubmit)="isEditMode ? updateEmployee() : addEmployee()">
+
+  <!-- Name -->
   <label>Name:</label>
-  <input type="text" [(ngModel)]="empModel.name" name="name" required />
+  <input 
+    type="text"
+    name="name"
+    [(ngModel)]="empModel.name"
+    required
+    minlength="3"
+    #name="ngModel"
+  />
 
+  <!-- Validation Messages -->
+  <div style="color: red;" *ngIf="name.invalid && name.touched">
+    <span *ngIf="name.errors?.['required']">Name is required.</span>
+    <span *ngIf="name.errors?.['minlength']">Name must be at least 3 characters.</span>
+  </div>
+
+  <!-- Department -->
   <label>Department:</label>
-  <input type="text" [(ngModel)]="empModel.department" name="department" required />
+  <input 
+    type="text"
+    name="department"
+    [(ngModel)]="empModel.department"
+    required
+    minlength="2"
+    #department="ngModel"
+  />
 
+  <div style="color: red;" *ngIf="department.invalid && department.touched">
+    <span *ngIf="department.errors?.['required']">Department is required.</span>
+    <span *ngIf="department.errors?.['minlength']">Department must be at least 2 characters.</span>
+  </div>
+
+  <!-- Salary -->
   <label>Salary:</label>
-  <input type="number" [(ngModel)]="empModel.salary" name="salary" required />
+  <input 
+    type="number"
+    name="salary"
+    [(ngModel)]="empModel.salary"
+    required
+    min="1000"
+    #salary="ngModel"
+  />
 
-  <button type="submit">
+  <div style="color: red;" *ngIf="salary.invalid && salary.touched">
+    <span *ngIf="salary.errors?.['required']">Salary is required.</span>
+    <span *ngIf="salary.errors?.['min']">Minimum salary must be 1000.</span>
+  </div>
+
+  <!-- Submit Buttons -->
+  <button type="submit" [disabled]="empForm.invalid">
     {{ isEditMode ? "Update Employee" : "Add Employee" }}
   </button>
 
   <button type="button" (click)="resetForm()" *ngIf="isEditMode">
     Cancel Edit
   </button>
+
 </form>
-
-<button type="button" (click)="downloadExcel()">Download Excel</button>
-<button type="button" (click)="downloadPdf()">Download PDF</button>
-
-<hr>
 
 <hr />
 

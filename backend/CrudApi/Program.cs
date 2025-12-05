@@ -24,6 +24,15 @@ builder.Services.AddCors(options =>
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy => policy.AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowAnyOrigin());
+});
+
+
 var app = builder.Build();
 
 // Swagger only in development
@@ -36,6 +45,10 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowAll");
 
 app.UseAuthorization();
+
+
+app.UseCors("AllowAll");
+
 
 app.MapControllers();
 
