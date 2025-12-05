@@ -1,0 +1,56 @@
+<h2>Employee Management</h2>
+
+<!-- Employee Form -->
+<form (ngSubmit)="isEditMode ? updateEmployee() : addEmployee()">
+  <label>Name:</label>
+  <input type="text" [(ngModel)]="empModel.name" name="name" required />
+
+  <label>Department:</label>
+  <input type="text" [(ngModel)]="empModel.department" name="department" required />
+
+  <label>Salary:</label>
+  <input type="number" [(ngModel)]="empModel.salary" name="salary" required />
+
+  <button type="submit">
+    {{ isEditMode ? "Update Employee" : "Add Employee" }}
+  </button>
+
+  <button type="button" (click)="resetForm()" *ngIf="isEditMode">
+    Cancel Edit
+  </button>
+</form>
+
+<button type="button" (click)="downloadExcel()">Download Excel</button>
+<button type="button" (click)="downloadPdf()">Download PDF</button>
+
+<hr>
+
+<hr />
+
+<!-- Employee Table -->
+<h3>Employee List</h3>
+
+<table border="1" width="100%" cellpadding="10">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Name</th>
+      <th>Department</th>
+      <th>Salary</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngFor="let emp of employees">
+      <td>{{ emp.id }}</td>
+      <td>{{ emp.name }}</td>
+      <td>{{ emp.department }}</td>
+      <td>{{ emp.salary }}</td>
+      <td>
+        <button (click)="editEmployee(emp)">Edit</button>
+        <button (click)="deleteEmployee(emp.id)">Delete</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
