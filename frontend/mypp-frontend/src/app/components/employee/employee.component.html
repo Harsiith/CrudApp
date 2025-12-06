@@ -1,7 +1,7 @@
 <h2>Employee Management</h2>
 
 <!-- Employee Form -->
-<form #empForm="ngForm" (ngSubmit)="isEditMode ? updateEmployee() : addEmployee()">
+<form #empForm="ngForm" (ngSubmit)="onSubmit(empForm)">
 
   <!-- Name -->
   <label>Name:</label>
@@ -53,7 +53,7 @@
   </div>
 
   <!-- Submit Buttons -->
-  <button type="submit" [disabled]="empForm.invalid">
+  <button type="submit">
     {{ isEditMode ? "Update Employee" : "Add Employee" }}
   </button>
 

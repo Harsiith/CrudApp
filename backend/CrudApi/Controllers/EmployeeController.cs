@@ -48,14 +48,6 @@ namespace CrudApi.Controllers
             return Ok(emp);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create(Employee emp)
-        {
-            _context.Employees.Add(emp);
-            await _context.SaveChangesAsync();
-            return Ok(emp);
-        }
-
 
         // ----------------------- UPDATE -----------------------
         [HttpPut("{id}")]
@@ -67,7 +59,7 @@ public async Task<IActionResult> Update(int id, Employee emp)
 
     existing.Name = emp.Name;
     existing.Department = emp.Department;
-    existing.Age = emp.Age;
+    // existing.Age = emp.Age;
 
     await _context.SaveChangesAsync();
     return Ok(existing);

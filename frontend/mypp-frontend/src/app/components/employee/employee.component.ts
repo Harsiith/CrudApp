@@ -25,7 +25,7 @@ export class EmployeeComponent implements OnInit {
 
   constructor(
     private empService: EmployeeService,
-    private cdr: ChangeDetectorRef   // 🔥 inject ChangeDetectorRef
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -36,9 +36,9 @@ export class EmployeeComponent implements OnInit {
     this.empService.getEmployees().subscribe(res => {
       console.log("Loaded employees:", res);
 
-      this.employees = [...res];   // 🔥 spread operator ensures new reference
+      this.employees = [...res]; 
 
-      this.cdr.detectChanges();    // 🔥 FORCES Angular to re-render immediately
+      this.cdr.markForCheck();   
     });
   }
 
@@ -46,12 +46,14 @@ export class EmployeeComponent implements OnInit {
     this.empService.addEmployee(this.empModel).subscribe(() => {
       this.resetForm();
       this.loadEmployees();
+      this.cdr.markForCheck();
     });
   }
 
   editEmployee(emp: any) {
     this.isEditMode = true;
     this.empModel = { ...emp };
+    this.cdr.markForCheck();
   }
 
   updateEmployee() {
@@ -59,12 +61,14 @@ export class EmployeeComponent implements OnInit {
       this.resetForm();
       this.loadEmployees();
       this.isEditMode = false;
+      this.cdr.markForCheck();
     });
   }
 
   deleteEmployee(id: number) {
     this.empService.deleteEmployee(id).subscribe(() => {
       this.loadEmployees();
+      this.cdr.markForCheck();
     });
   }
 
@@ -76,5 +80,19 @@ export class EmployeeComponent implements OnInit {
       salary: 0
     };
     this.isEditMode = false;
+    this.cdr.markForCheck();
   }
+  onSubmit(form: any) {
+  if (form.invalid) {
+    alert("Please fill all required fields!");
+    return;
+  }
+
+  if (this.isEditMode) {
+    this.updateEmployee();
+  } else {
+    this.addEmployee();
+  }
+}
+
 }
