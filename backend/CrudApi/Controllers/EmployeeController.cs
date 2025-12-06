@@ -2,9 +2,6 @@ using CrudApi.Data;
 using CrudApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using QuestPDF.Fluent;
-using QuestPDF.Helpers;
-using QuestPDF.Infrastructure;
 
 namespace CrudApi.Controllers
 {
@@ -23,7 +20,6 @@ namespace CrudApi.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-    
             var employees = await _context.Employees.ToListAsync();
             return Ok(employees);
         }
@@ -32,96 +28,49 @@ namespace CrudApi.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var emp = await _context.Employees.FindAsync(id);
-            if (emp == null)
+            var employee = await _context.Employees.FindAsync(id);
+            if (employee == null)
                 return NotFound();
 
-            return Ok(emp);
+            return Ok(employee);
         }
 
         // ----------------------- CREATE -----------------------
         [HttpPost]
-        public async Task<IActionResult> Create(Employee emp)
+        public async Task<IActionResult> Create(Employee employee)
         {
-            _context.Employees.Add(emp);
+            await _context.Employees.AddAsync(employee);
             await _context.SaveChangesAsync();
-            return Ok(emp);
+            return Ok(employee);
         }
-
 
         // ----------------------- UPDATE -----------------------
         [HttpPut("{id}")]
-public async Task<IActionResult> Update(int id, Employee emp)
-{
-    var existing = await _context.Employees.FindAsync(id);
-    if (existing == null)
-        return NotFound();
+        public async Task<IActionResult> Update(int id, Employee updatedEmployee)
+        {
+            var existing = await _context.Employees.FindAsync(id);
+            if (existing == null)
+                return NotFound();
 
-    existing.Name = emp.Name;
-    existing.Department = emp.Department;
-    // existing.Age = emp.Age;
+            existing.Name = updatedEmployee.Name;
+            existing.Department = updatedEmployee.Department;
+            existing.Salary = updatedEmployee.Salary;
 
-    await _context.SaveChangesAsync();
-    return Ok(existing);
-}
-
-
-        
+            await _context.SaveChangesAsync();
+            return Ok(existing);
+        }
 
         // ----------------------- DELETE -----------------------
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            var emp = await _context.Employees.FindAsync(id);
-            if (emp == null)
+            var employee = await _context.Employees.FindAsync(id);
+            if (employee == null)
                 return NotFound();
 
-            _context.Employees.Remove(emp);
+            _context.Employees.Remove(employee);
             await _context.SaveChangesAsync();
             return Ok();
-        }
-
-        // ----------------------- EXPORT PDF -----------------------
-        [HttpGet("export/pdf")]
-        public async Task<IActionResult> ExportPdf()
-        {
-            var employees = await _context.Employees.ToListAsync();
-
-            var document = Document.Create(container =>
-            {
-                container.Page(page =>
-                {
-                    page.Margin(20);
-                    page.Header().Text("Employee Report").FontSize(22).SemiBold();
-
-                    page.Content().Table(table =>
-                    {
-                        table.ColumnsDefinition(cols =>
-                        {
-                            cols.RelativeColumn();
-                            cols.RelativeColumn();
-                        });
-
-                        table.Header(header =>
-                        {
-                            header.Cell().Text("Name").Bold();
-                            header.Cell().Text("Department").Bold();
-                        });
-
-                        foreach (var e in employees)
-                        {
-                            table.Cell().Text(e.Name);
-                            table.Cell().Text(e.Department);
-                        }
-                    });
-
-                    page.Footer().AlignCenter().Text($"Generated: {DateTime.Now}");
-                });
-            });
-
-            byte[] pdf = document.GeneratePdf();
-
-            return File(pdf, "application/pdf", "employees.pdf");
         }
     }
 }
