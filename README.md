@@ -1,135 +1,126 @@
-This repository contains a complete full-stack CRUD application built using:
+🚀 CRUD Application (Angular + .NET 8 + SQL Server)
 
-Frontend: Angular
+This project is a full-stack CRUD (Create, Read, Update, Delete) application built using:
 
-Backend: ASP.NET Core Web API (.NET 8)
+Frontend: Angular 17
 
-Database: PostgreSQL
+Backend: ASP.NET Core 8 Web API
 
-Extras: EPPlus 8 (Excel export), QuestPDF (PDF export)
+Database: SQL Server (EF Core)
+
+Extras: PDF & Excel Export, Validation, Responsive UI
+
+📌 Features
+✅ Frontend (Angular)
+
+Add, Edit, Delete Employees
+
+Form validation (min length, required, numbers)
+
+Stylish UI with centered design
+
+Export employee list to:
+
+PDF
+
+Excel
+
+API integration using Angular services
+
+✅ Backend (ASP.NET Core API)
+
+REST API for CRUD operations
+
+Separate controllers for:
+
+EmployeeController → CRUD
+
+ExportController → PDF / Excel export
+
+Uses Entity Framework Core
+
+Generates professional PDF using QuestPDF
+
+Generates Excel using EPPlus
 
 📁 Project Structure
-/
+CrudApp/
+│
 ├── backend/
 │   ├── CrudApi/
 │   │   ├── Controllers/
 │   │   │   ├── EmployeeController.cs
-│   │   │   └── ExportController.cs
-│   │   ├── Models/
-│   │   │   └── Employee.cs
-│   │   ├── Data/
-│   │   │   └── AppDbContext.cs
+│   │   │   ├── ExportController.cs
+│   │   ├── Data/AppDbContext.cs
+│   │   ├── Models/Employee.cs
 │   │   ├── Program.cs
 │   │   └── appsettings.json
-│   │
-│   └── ... (other backend files)
 │
 └── frontend/
-    └── Angular App (components, services, UI)
+    ├── mypp-frontend/
+    │   ├── src/app/employee/
+    │   │   ├── employee.component.ts
+    │   │   ├── employee.component.html
+    │   │   ├── employee.component.css
+    │   ├── services/employee.service.ts
+    │   └── ...
 
-⚙️ Backend Setup (ASP.NET Core + PostgreSQL)
-🔧 1. Restore Dependencies
-cd backend/CrudApi
+⚙️ Backend Setup
+▶️ 1. Install Dependencies
+
+Run inside the backend folder:
+
 dotnet restore
 
-🗄️ 2. PostgreSQL Configuration
-
-Update appsettings.json:
-
+▶️ 2. Update Connection String in appsettings.json
 "ConnectionStrings": {
-  "DefaultConnection": "Host=localhost;Port=5432;Database=cruddb;Username=postgres;Password=yourpassword"
+  "DefaultConnection": "Server=YOUR_SERVER;Database=CrudDb;Trusted_Connection=True;"
 }
 
-🧱 3. Run Migrations
-dotnet ef migrations add InitialCreate
+▶️ 3. Run Migrations
 dotnet ef database update
 
-▶️ 4. Run Backend
+▶️ 4. Start API
 dotnet run
 
 
-API will run at:
+The API runs by default at:
 
-https://localhost:7092
-http://localhost:5092
+http://localhost:5280
 
-📄 Available Backend Endpoints
-CRUD (Employee)
-Method	Endpoint	Description
-GET	/api/employee	Get all employees
-GET	/api/employee/{id}	Get employee by ID
-POST	/api/employee	Add new employee
-PUT	/api/employee/{id}	Update employee
-DELETE	/api/employee/{id}	Delete employee
-Export
-Endpoint	Type	Description
-/api/export/excel	GET	Download Excel file
-/api/export/pdf	GET	Download PDF report
-🖥️ Frontend Setup (Angular)
+🌐 Frontend Setup (Angular)
+
+Inside the Angular project:
+
 ▶️ 1. Install Dependencies
-cd frontend
 npm install
 
-▶️ 2. Run Angular App
-ng serve -o
+▶️ 2. Install File-Saver, XLSX, and Types
+npm install file-saver xlsx
+npm install --save-dev @types/file-saver
+
+▶️ 3. Start Angular App
+ng serve --open
 
 
-Runs on:
+Default URL:
 
-http://localhost:4200/
+http://localhost:4200
 
-🔄 API Integration
+📤 Export Features
+📄 PDF Export
 
-Update API base URL inside Angular service:
+Backend generates a table-styled PDF using QuestPDF.
 
-src/app/services/employee.service.ts
+GET http://localhost:5280/api/export/pdf
 
-apiUrl = 'http://localhost:5092/api';
+📊 Excel Export
 
-🧰 Tech Stack Used
-Backend
+Backend generates .xlsx using EPPlus.
 
-ASP.NET Core Web API (.NET 8)
+GET http://localhost:5280/api/export/excel
 
-Entity Framework Core
-
-PostgreSQL
-
-EPPlus 8 (Excel Export)
-
-QuestPDF (PDF Reports)
-
-Swagger (API Docs)
-
-Frontend
-
-Angular
-
-Bootstrap / CSS styling
-
-HttpClient for API calls
-
-📦 Features
-✔ CRUD Operations (Create, Read, Update, Delete)
-✔ Form Validation
-✔ Fetch Single Employee
-✔ Fetch All Employees
-✔ Export Employee List as Excel (.xlsx)
-✔ Export Employee List as PDF
-✔ PostgreSQL Integration
-✔ Clean API + Angular UI
-📝 How to Upload to GitHub
-git init
-git add .
-git commit -m "Initial Commit - Full stack CRUD App"
-git branch -M main
-git remote add origin <your-repo-url>
-git push -u origin main
-
-🤝 Contributions
+🤝 Contributing
 
 Pull requests are welcome!
-
-📜 License
-
-This project is completely free to use and modify.
+For major changes, please open an issue first to discuss what you’d like to change.
