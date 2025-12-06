@@ -3,6 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { EmployeeService } from '../../services/employee.service';
 
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+
+import * as ExcelJS from 'exceljs';
+import { saveAs } from 'file-saver';
+
 @Component({
   selector: 'app-employee',
   standalone: true,
@@ -34,11 +40,8 @@ export class EmployeeComponent implements OnInit {
 
   loadEmployees() {
     this.empService.getEmployees().subscribe(res => {
-      console.log("Loaded employees:", res);
-
-      this.employees = [...res]; 
-
-      this.cdr.markForCheck();   
+      this.employees = [...res];
+      this.cdr.markForCheck();
     });
   }
 
@@ -46,14 +49,12 @@ export class EmployeeComponent implements OnInit {
     this.empService.addEmployee(this.empModel).subscribe(() => {
       this.resetForm();
       this.loadEmployees();
-      this.cdr.markForCheck();
     });
   }
 
   editEmployee(emp: any) {
     this.isEditMode = true;
     this.empModel = { ...emp };
-    this.cdr.markForCheck();
   }
 
   updateEmployee() {
@@ -61,38 +62,71 @@ export class EmployeeComponent implements OnInit {
       this.resetForm();
       this.loadEmployees();
       this.isEditMode = false;
-      this.cdr.markForCheck();
     });
   }
 
   deleteEmployee(id: number) {
     this.empService.deleteEmployee(id).subscribe(() => {
       this.loadEmployees();
-      this.cdr.markForCheck();
     });
   }
 
   resetForm() {
-    this.empModel = {
-      id: 0,
-      name: '',
-      department: '',
-      salary: 0
-    };
+    this.empModel = { id: 0, name: '', department: '', salary: 0 };
     this.isEditMode = false;
-    this.cdr.markForCheck();
-  }
-  onSubmit(form: any) {
-  if (form.invalid) {
-    alert("Please fill all required fields!");
-    return;
   }
 
-  if (this.isEditMode) {
-    this.updateEmployee();
-  } else {
-    this.addEmployee();
+  onSubmit(form: any) {
+    if (form.invalid) {
+      alert("Please fill all required fields!");
+      return;
+    }
+
+    this.isEditMode ? this.updateEmployee() : this.addEmployee();
   }
-}
+
+  // ------------------------------------------------------
+  // 🔽 DOWNLOAD AS PDF
+  // ------------------------------------------------------
+  downloadPDF() {
+    const doc = new jsPDF();
+
+    doc.text("Employee List", 14, 10);
+
+    autoTable(doc, {
+      startY: 20,
+      head: [['ID', 'Name', 'Department', 'Salary']],
+      body: this.employees.map(emp => [
+        emp.id,
+        emp.name,
+        emp.department,
+        emp.salary
+      ])
+    });
+
+    doc.save("Employees.pdf");
+  }
+
+  // ------------------------------------------------------
+  // 🔽 DOWNLOAD AS EXCEL
+  // ------------------------------------------------------
+  async downloadExcel() {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Employees');
+
+    // Add header row
+    worksheet.addRow(['ID', 'Name', 'Department', 'Salary']);
+
+    // Add data rows
+    this.employees.forEach(emp => {
+      worksheet.addRow([emp.id, emp.name, emp.department, emp.salary]);
+    });
+
+    // Create file buffer
+    const buffer = await workbook.xlsx.writeBuffer();
+
+    // Save file
+    saveAs(new Blob([buffer]), 'Employees.xlsx');
+  }
 
 }
